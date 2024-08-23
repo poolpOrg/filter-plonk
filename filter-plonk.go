@@ -23,7 +23,7 @@ type SessionData struct {
 
 func linkAuthCb(timestamp time.Time, session filter.Session, result string, username string) {
 	sessionData := session.Get().(*SessionData)
-	sessionData.authenticated = result == "ok"
+	sessionData.authenticated = result == "pass"
 }
 
 func filterDataLineCb(timestamp time.Time, session filter.Session, line string) []string {
@@ -34,7 +34,6 @@ func filterDataLineCb(timestamp time.Time, session filter.Session, line string) 
 				if len(list) >= 1 {
 					sessionData.sender = strings.ToLower(list[0].Address)
 				}
-				fmt.Fprintf(os.Stderr, "extracted sender: [%s]\n", sessionData.sender)
 			}
 		} else if strings.HasPrefix(line, "To: ") {
 			if list, err := mail.ParseAddressList(strings.TrimPrefix(line, "To: ")); err == nil {
@@ -42,7 +41,6 @@ func filterDataLineCb(timestamp time.Time, session filter.Session, line string) 
 					sessionData.recipients = append(sessionData.recipients, strings.ToLower(addr.Address))
 				}
 			}
-			fmt.Fprintf(os.Stderr, "extracted recipients: [%s]\n", sessionData.recipients)
 		} else if line == "" {
 			sessionData.inHeaders = false
 		}
